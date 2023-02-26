@@ -20,6 +20,7 @@
   <modules>
     <module>01-authentication</module>
     <module>02-authorization</module>
+    <module>03-ini-config</module>
   </modules>
 
   <dependencies>
