@@ -42,7 +42,7 @@ public class CustomShiroRealm implements Realm {
      * <p>
      * 返回{@code true}则说明：该{@link CustomShiroRealm}可以对传入的{@link AuthenticationToken}进行身份验证
      * <p>
-     * 这里设置为支持类型为{@link org.apache.shiro.authc.UsernamePasswordToken}的token
+     * 这里设置支持类型为{@link org.apache.shiro.authc.UsernamePasswordToken}的token
      *
      * @return 该 {@link CustomShiroRealm} 是否支持传入的{@link AuthenticationToken}，
      * {@code true} = 支持，{@code false} = 不支持

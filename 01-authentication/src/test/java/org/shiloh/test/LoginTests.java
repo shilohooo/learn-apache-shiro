@@ -42,7 +42,7 @@ public class LoginTests extends BaseShiroTests {
      *     </li>
      *     <li>
      *         调用{@link Subject#login(AuthenticationToken)}方法，将token作为参数进行登录，
-     *         其会自动委托给{@link SecurityManager#logout(Subject)}方法进行登录
+     *         其会自动委托给{@link SecurityManager#login(Subject, AuthenticationToken)}方法进行登录
      *     </li>
      *     <li>
      *         当身份验证失败时，可以通过捕获{@link org.apache.shiro.authc.AuthenticationException}或其子类异常从而得知身份验证失
@@ -207,8 +207,8 @@ public class LoginTests extends BaseShiroTests {
         // 获取subject
         final Subject subject = SecurityUtils.getSubject();
         // 创建token，用于登录认证
-        final String username = "zhang";
-        final String password = "123";
+        final String username = "shiloh";
+        final String password = "123456";
         final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 
         try {

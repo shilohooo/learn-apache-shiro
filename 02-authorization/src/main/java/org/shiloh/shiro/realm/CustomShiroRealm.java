@@ -58,10 +58,10 @@ public class CustomShiroRealm extends AuthorizingRealm {
         final String username = (String) token.getPrincipal();
         final String password = new String((char[]) token.getCredentials());
         // 检查用户名密码是否正确
-        if (!"zhang".equals(username)) {
+        if (!"shiloh".equals(username)) {
             throw new UnknownAccountException("用户不存在！");
         }
-        if (!"123".equals(password)) {
+        if (!"123456".equals(password)) {
             throw new IncorrectCredentialsException("用户名/密码错误！");
         }
 

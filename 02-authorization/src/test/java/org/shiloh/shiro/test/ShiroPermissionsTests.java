@@ -31,7 +31,7 @@ public class ShiroPermissionsTests extends BaseShiroTests {
         // login
         final String username = "zhang";
         final String password = "123";
-        super.login("classpath:shiro/config/shiro-role.ini", username, password);
+        super.login("classpath:shiro/config/shiro-permissions.ini", username, password);
 
         final Subject subject = SecurityUtils.getSubject();
         // 判断用户具有权限：user:create
@@ -56,7 +56,7 @@ public class ShiroPermissionsTests extends BaseShiroTests {
         // login
         final String username = "zhang";
         final String password = "123";
-        super.login("classpath:shiro/config/shiro-role.ini", username, password);
+        super.login("classpath:shiro/config/shiro-permissions.ini", username, password);
 
         final Subject subject = SecurityUtils.getSubject();
         // 判断是否拥有权限：user:create

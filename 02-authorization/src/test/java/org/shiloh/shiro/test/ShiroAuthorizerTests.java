@@ -58,8 +58,8 @@ public class ShiroAuthorizerTests extends BaseShiroTests {
     @Test
     public void testIsPermittedUsingJdbcRealm() {
         // login
-        final String username = "zhang";
-        final String password = "123";
+        final String username = "shiloh";
+        final String password = "123456";
         super.login("classpath:shiro/config/shiro-jdbc-authorizer.ini", username, password);
 
         final Subject subject = SecurityUtils.getSubject();
