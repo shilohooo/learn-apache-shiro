@@ -18,9 +18,14 @@
   </properties>
 
   <modules>
+    <!--    身份认证-->
     <module>01-authentication</module>
+    <!--    授权-->
     <module>02-authorization</module>
+    <!--    ini 配置-->
     <module>03-ini-config</module>
+    <!--    加解密-->
+    <module>04-cryptograph</module>
   </modules>
 
   <dependencies>
@@ -64,6 +69,12 @@
       <groupId>com.alibaba</groupId>
       <artifactId>druid</artifactId>
       <version>1.2.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.23.1</version>
     </dependency>
   </dependencies>
 
