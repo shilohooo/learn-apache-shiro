@@ -50,14 +50,14 @@ public class MyRealm2 extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // 帐号 和 salt1
-        final String username = "liu";
+        final String username = "bruce";
         // salt 2
-        final String salt2 = "0ea9a6473813c364c017cf8f773be3d6";
+        final String passwordSalt = "10542c9c3e6437066859b38457d23d87";
         // 加密后的密码
-        final String password = "000b61ef70e3f30b977d4eaf40c7a667";
-        final SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(username, password, getName());
-        // 设置盐（用户名加随机数），HashedCredentialsMatcher 会自动识别这个盐
-        sai.setCredentialsSalt(ByteSource.Util.bytes(username + salt2));
-        return sai;
+        final String password = "b4b29f478420d8b55fb20ea9c72e744e";
+        final SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(username, password, getName());
+        // 设置盐（用户名 + 随机数），HashedCredentialsMatcher 会自动识别这个盐
+        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(username + passwordSalt));
+        return authenticationInfo;
     }
 }
