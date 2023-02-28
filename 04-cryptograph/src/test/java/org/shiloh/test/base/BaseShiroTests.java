@@ -1,7 +1,6 @@
 package org.shiloh.test.base;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.env.BasicIniEnvironment;
@@ -41,12 +40,8 @@ public class BaseShiroTests {
         // 创建用户名、密码用于身份验证
         final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 
-        try {
-            // login
-            subject.login(token);
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        }
+        // login
+        subject.login(token);
 
         if (subject.isAuthenticated()) {
             LOG.info("用户【{}】登录成功啦:)", username);
