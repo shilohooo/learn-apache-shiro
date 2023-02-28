@@ -2,7 +2,7 @@ package org.shiloh.test;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.AbstractConverter;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
+import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
@@ -125,5 +125,31 @@ public class PasswordValidateTests extends BaseShiroTests {
         protected Class<?> getDefaultType() {
             return Enum.class;
         }
+    }
+
+    /**
+     * 测试密码重试次数限制
+     *
+     * @author shiloh
+     * @date 2023/2/28 17:25
+     */
+    @Test(expected = ExcessiveAttemptsException.class)
+    public void testRetryLimitHashCredentialsMatcherWithMyRealm() {
+        for (int i = 0; i < 5; i++) {
+            try {
+                login(
+                        "classpath:shiro/config/shiro-retry-limit-hash-credentials-matcher.ini",
+                        "bruce",
+                        "0123456"
+                );
+            } catch (Exception ignored) {
+            }
+        }
+        // 重试 5 次后再登录一次
+        login(
+                "classpath:shiro/config/shiro-retry-limit-hash-credentials-matcher.ini",
+                "bruce",
+                "0123456"
+        );
     }
 }
