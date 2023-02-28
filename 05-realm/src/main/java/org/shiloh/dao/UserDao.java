@@ -60,6 +60,16 @@ public interface UserDao {
     void removeRoleRefs(Long userId, Long... roleIds);
 
     /**
+     * 根据 ID 查询用户信息
+     *
+     * @param id ID
+     * @return 用户实体
+     * @author shiloh
+     * @date 2023/2/28 23:03
+     */
+    User findById(Long id);
+
+    /**
      * 根据用户名查询用户信息
      *
      * @param username 用户名
@@ -88,4 +98,15 @@ public interface UserDao {
      * @date 2023/2/28 18:26
      */
     Set<String> findPermissionsByUsername(String username);
+
+    /**
+     * 根据用户 ID 和角色 ID 查询用户与角色的关联关系是否存在
+     *
+     * @param userId 用户 ID
+     * @param roleId 角色 ID
+     * @return 如果用户与角色的关联关系存在就返回 {@code true}，否则返回 {@code false}
+     * @author shiloh
+     * @date 2023/2/28 22:53
+     */
+    Boolean isUserRoleRefExists(Long userId, Long roleId);
 }

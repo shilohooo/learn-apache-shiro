@@ -47,4 +47,15 @@ public interface RoleDao {
      * @date 2023/2/28 18:25
      */
     void removePermissionRefs(Long roleId, Long... permissionIds);
+
+    /**
+     * 根据角色 ID 和权限 ID 查询角色与权限的关联关系是否存在
+     *
+     * @param roleId       角色 ID
+     * @param permissionId 权限 ID
+     * @return 如果角色与权限的关联关系存在则返回 {@code true}，否则返回 {@code false}
+     * @author shiloh
+     * @date 2023/2/28 22:46
+     */
+    Boolean isRolePermissionRefExists(Long roleId, Long permissionId);
 }
