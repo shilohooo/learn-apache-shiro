@@ -1,8 +1,6 @@
 package org.shiloh.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.shiloh.entity.base.BaseEntity;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -19,6 +17,8 @@ import java.util.Objects;
 @Setter
 @Getter
 @ToString(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Permission extends BaseEntity implements RowMapper<Permission> {
     private static final long serialVersionUID = -6628063033051192038L;
 

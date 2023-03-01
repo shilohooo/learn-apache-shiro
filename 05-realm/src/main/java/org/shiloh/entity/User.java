@@ -1,6 +1,7 @@
 package org.shiloh.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.shiloh.entity.base.BaseEntity;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class User extends BaseEntity implements RowMapper<User> {
     private static final long serialVersionUID = 6201531861329400346L;
 
@@ -41,6 +43,21 @@ public class User extends BaseEntity implements RowMapper<User> {
      * 帐号是否被锁定，默认为：{@link Boolean#FALSE}
      */
     private Boolean locked = Boolean.FALSE;
+
+    /**
+     * 带参构造器
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @param locked   帐号是否被锁定
+     * @author shiloh
+     * @date 2023/3/1 17:15
+     */
+    public User(String username, String password, Boolean locked) {
+        this.username = username;
+        this.password = password;
+        this.locked = locked;
+    }
 
     /**
      * 获取用于加密密码的盐
