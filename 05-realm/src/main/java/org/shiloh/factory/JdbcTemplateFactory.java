@@ -53,9 +53,9 @@ public class JdbcTemplateFactory {
 
             final DruidDataSource dataSource = new DruidDataSource();
             dataSource.setDriverClassName(properties.getProperty("jdbc.driver-class-name"));
-            dataSource.setUrl("jdbc.url");
-            dataSource.setUsername("jdbc.username");
-            dataSource.setPassword("jdbc.password");
+            dataSource.setUrl(properties.getProperty("jdbc.url"));
+            dataSource.setUsername(properties.getProperty("jdbc.username"));
+            dataSource.setPassword(properties.getProperty("jdbc.password"));
 
             jdbcTemplate.setDataSource(dataSource);
         } catch (IOException e) {
