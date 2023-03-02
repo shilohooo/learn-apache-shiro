@@ -162,7 +162,6 @@ public class BaseTests {
         // 获取subject
         final Subject subject = SecurityUtils.getSubject();
         // 创建用户名、密码用于身份验证
-        LOG.info("login password {}", password);
         final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 
         // login

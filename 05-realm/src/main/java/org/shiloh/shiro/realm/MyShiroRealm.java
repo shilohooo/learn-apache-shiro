@@ -76,7 +76,6 @@ public class MyShiroRealm extends AuthorizingRealm {
             // 帐号已被锁定
             throw new LockedAccountException();
         }
-        log.info("realm password {}", user.getPassword());
         // 交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以在此判断或自定义实现
         return new SimpleAuthenticationInfo(
                 // 帐号
