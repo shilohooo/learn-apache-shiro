@@ -3,6 +3,7 @@ package org.shiloh.dao.impl;
 import org.shiloh.dao.UserDao;
 import org.shiloh.entity.User;
 import org.shiloh.factory.JdbcTemplateFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
@@ -223,7 +224,12 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User findByUsername(String username) {
-        return this.jdbcTemplate.queryForObject(QUERY_BY_USERNAME, new User(), username);
+        try {
+            return this.jdbcTemplate.queryForObject(QUERY_BY_USERNAME, new User(), username);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
