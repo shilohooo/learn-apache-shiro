@@ -26,7 +26,10 @@
     <module>03-ini-config</module>
     <!--    加解密-->
     <module>04-cryptograph</module>
+    <!--    Realm-->
     <module>05-realm</module>
+    <!--    Web集成-->
+    <module>06-webapp</module>
   </modules>
 
   <dependencies>
@@ -94,6 +97,18 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>5.2.5.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <version>1.7.1</version>
     </dependency>
   </dependencies>
 
