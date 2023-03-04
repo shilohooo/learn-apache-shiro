@@ -5,7 +5,6 @@ import org.apache.shiro.web.filter.AccessControlFilter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 
 /**
  * 自定义访问控制 Filter
@@ -14,7 +13,6 @@ import javax.servlet.annotation.WebFilter;
  * @date 2023/3/4 19:34
  */
 @Slf4j
-@WebFilter(filterName = "myAccessControlFilter", urlPatterns = "/*")
 public class MyAccessControlFilter extends AccessControlFilter {
     /**
      * 是否允许访问，如果是则返回 {@code true}

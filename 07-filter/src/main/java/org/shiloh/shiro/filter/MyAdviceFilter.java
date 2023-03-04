@@ -5,7 +5,6 @@ import org.apache.shiro.web.servlet.AdviceFilter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 
 /**
  * 提供 AOP 功能的过滤器：{@link AdviceFilter}
@@ -16,7 +15,6 @@ import javax.servlet.annotation.WebFilter;
  * @date 2023/3/4 19:05
  */
 @Slf4j
-@WebFilter(filterName = "myAdviceFilter", urlPatterns = "/*")
 public class MyAdviceFilter extends AdviceFilter {
     /**
      * 请求预处理，根据返回值决定是否继续处理，返回 {@code true} 代表继续执行过滤器链

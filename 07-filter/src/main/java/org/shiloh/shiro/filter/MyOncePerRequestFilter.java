@@ -7,7 +7,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
@@ -19,7 +18,6 @@ import java.io.IOException;
  * @date 2023/3/4 16:41
  */
 @Slf4j
-@WebFilter(filterName = "myOncePerRequestFilter", urlPatterns = "/*")
 public class MyOncePerRequestFilter extends OncePerRequestFilter {
     /**
      * Same contract as for

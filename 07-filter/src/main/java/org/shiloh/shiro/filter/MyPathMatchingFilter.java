@@ -5,7 +5,6 @@ import org.apache.shiro.web.filter.PathMatchingFilter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import java.util.Arrays;
 
 /**
@@ -17,7 +16,6 @@ import java.util.Arrays;
  * @date 2023/3/4 19:20
  */
 @Slf4j
-@WebFilter(filterName = "myPathMatchingFilter", urlPatterns = "/*")
 public class MyPathMatchingFilter extends PathMatchingFilter {
     /**
      * 在 {@link #preHandle(ServletRequest, ServletResponse)} 中，当 {@link #pathsMatch(String, ServletRequest)}匹配到一个
