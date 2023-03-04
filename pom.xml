@@ -32,6 +32,8 @@
     <module>06-webapp</module>
     <!--    过滤器-->
     <module>07-filter</module>
+    <!--    Shiro JSP标签-->
+    <module>08-jsp-tag</module>
   </modules>
 
   <dependencies>
@@ -111,6 +113,18 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
       <version>1.7.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.2.1-b03</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
     </dependency>
   </dependencies>
 
