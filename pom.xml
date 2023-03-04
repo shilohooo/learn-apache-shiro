@@ -30,6 +30,8 @@
     <module>05-realm</module>
     <!--    Web集成-->
     <module>06-webapp</module>
+    <!--    过滤器-->
+    <module>07-filter</module>
   </modules>
 
   <dependencies>
