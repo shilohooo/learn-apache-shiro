@@ -34,6 +34,8 @@
     <module>07-filter</module>
     <!--    Shiro JSP标签-->
     <module>08-jsp-tag</module>
+    <!--    会话管理-->
+    <module>09-session-management</module>
   </modules>
 
   <dependencies>
@@ -125,6 +127,16 @@
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-quartz</artifactId>
+      <version>1.7.1</version>
     </dependency>
   </dependencies>
 

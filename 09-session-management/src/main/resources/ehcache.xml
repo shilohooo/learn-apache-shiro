@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ehcache name="es">
+  <diskStore path="java.io.tmpdir"/>
+
+  <!--  Cache 的名字为 shiro-activeSessionCache，即设置的 sessionDAO 的 activeSessionsCacheName 属性值。-->
+  <cache
+    name="shiro-activeSessionCache"
+    maxEntriesLocalHeap="10000"
+    overflowToDisk="false"
+    eternal="false"
+    diskPersistent="false"
+    timeToLiveSeconds="0"
+    timeToIdleSeconds="0"
+    statistics="true"
+  />
+</ehcache>
