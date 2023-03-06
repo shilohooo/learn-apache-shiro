@@ -36,6 +36,8 @@
     <module>08-jsp-tag</module>
     <!--    会话管理-->
     <module>09-session-management</module>
+    <!--    缓存-->
+    <module>10-cache</module>
   </modules>
 
   <dependencies>

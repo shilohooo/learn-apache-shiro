@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Shiro缓存配置-->
+<ehcache name="shirocache">
+
+  <diskStore path="java.io.tmpdir"/>
+
+  <!--  授权缓存配置-->
+  <cache name="authorizationCache"
+         maxEntriesLocalHeap="2000"
+         eternal="false"
+         timeToIdleSeconds="3600"
+         timeToLiveSeconds="0"
+         overflowToDisk="false"
+         statistics="true">
+  </cache>
+
+  <!--  身份验证缓存配置-->
+  <cache name="authenticationCache"
+         maxEntriesLocalHeap="2000"
+         eternal="false"
+         timeToIdleSeconds="3600"
+         timeToLiveSeconds="0"
+         overflowToDisk="false"
+         statistics="true">
+  </cache>
+
+  <!--  Session 缓存配置-->
+  <cache name="shiro-activeSessionCache"
+         maxEntriesLocalHeap="2000"
+         eternal="false"
+         timeToIdleSeconds="3600"
+         timeToLiveSeconds="0"
+         overflowToDisk="false"
+         statistics="true">
+  </cache>
+
+</ehcache>
