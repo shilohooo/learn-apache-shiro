@@ -1,6 +1,10 @@
 package org.shiloh.test;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shiloh.web.ComponentScanConfig;
@@ -10,14 +14,14 @@ import org.shiloh.web.entity.User;
 import org.shiloh.web.service.PermissionService;
 import org.shiloh.web.service.RoleService;
 import org.shiloh.web.service.UserService;
+import org.shiloh.web.shiro.realm.MyShiroRealm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Shiro 集成 Spring 单元测试
@@ -68,11 +72,11 @@ public class ShiroTests {
     @Autowired
     private PermissionService permissionService;
 
-    // @Autowired
-    // private MyShiroRealm myShiroRealm;
+    @Autowired
+    private MyShiroRealm myShiroRealm;
 
-    // @Autowired
-    // private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 测试密码
@@ -106,14 +110,14 @@ public class ShiroTests {
      * @author shiloh
      * @date 2023/3/1 17:04
      */
-    // @Before
+    @Before
     public void setup() {
         // 清除旧数据
-        // this.jdbcTemplate.update(DELETE_ALL_USERS);
-        // this.jdbcTemplate.update(DELETE_ALL_ROLES);
-        // this.jdbcTemplate.update(DELETE_ALL_PERMISSIONS);
-        // this.jdbcTemplate.update(DELETE_ALL_USER_ROLE_REFS);
-        // this.jdbcTemplate.update(DELETE_ALL_ROLE_PERMISSION_REFS);
+        this.jdbcTemplate.update(DELETE_ALL_USERS);
+        this.jdbcTemplate.update(DELETE_ALL_ROLES);
+        this.jdbcTemplate.update(DELETE_ALL_PERMISSIONS);
+        this.jdbcTemplate.update(DELETE_ALL_USER_ROLE_REFS);
+        this.jdbcTemplate.update(DELETE_ALL_ROLE_PERMISSION_REFS);
 
         // 1.新增权限信息
         permission1 = this.permissionService.add(new Permission("user:create", "用户模块新增", Boolean.TRUE));
@@ -150,20 +154,17 @@ public class ShiroTests {
      */
     @Test
     public void test() {
-        // final Subject subject = SecurityUtils.getSubject();
-        // UsernamePasswordToken token = new UsernamePasswordToken(user1.getUsername(), user1.getPassword());
-        // subject.login(token);
-        // assertThat(subject.isAuthenticated()).isTrue();
-        // subject.checkRole("admin");
-        // subject.checkPermission("user:create");
-        // this.userService.changePassword(user1.getId(), PASSWORD + "1");
-        // this.myShiroRealm.clearCache(subject.getPrincipals());
-        //
-        // this.user1 = this.userService.findByUsername(user1.getUsername());
-        // token = new UsernamePasswordToken(user1.getUsername(), user1.getPassword());
-        // subject.login(token);
-        final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ComponentScanConfig.class);
-        final String[] beanNames = context.getBeanNamesForAnnotation(Bean.class);
-        System.out.println(Arrays.toString(beanNames));
+        final Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken(user1.getUsername(), user1.getPassword());
+        subject.login(token);
+        assertThat(subject.isAuthenticated()).isTrue();
+        subject.checkRole("admin");
+        subject.checkPermission("user:create");
+        this.userService.changePassword(user1.getId(), PASSWORD + "1");
+        this.myShiroRealm.clearCache(subject.getPrincipals());
+
+        this.user1 = this.userService.findByUsername(user1.getUsername());
+        token = new UsernamePasswordToken(user1.getUsername(), user1.getPassword());
+        subject.login(token);
     }
 }
