@@ -1,13 +1,13 @@
 package org.shiloh.web.shiro.credentials;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.SaltedAuthenticationInfo;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.crypto.hash.SimpleHash;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2023/2/28 17:05
  */
 public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
-    private final Cache passwordRetryCache;
+    private final Cache<String, Element> passwordRetryCache;
 
     public RetryLimitHashCredentialsMatcher(CacheManager cacheManager) {
         this.passwordRetryCache = cacheManager.getCache("passwordRetryCache");
@@ -44,7 +44,7 @@ public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
         Element element = this.passwordRetryCache.get(username);
         if (element == null) {
             element = new Element(username, new AtomicInteger(0));
-            this.passwordRetryCache.put(element);
+            this.passwordRetryCache.put(username, element);
         }
         final AtomicInteger retryCount = (AtomicInteger) element.getObjectValue();
         if (retryCount.incrementAndGet() > 5) {

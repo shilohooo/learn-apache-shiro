@@ -1,6 +1,5 @@
 package org.shiloh.web.shiro.realm;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -11,6 +10,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.shiloh.web.entity.User;
 import org.shiloh.web.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 自定义 Shiro Realm
@@ -19,11 +20,12 @@ import org.shiloh.web.service.UserService;
  * @date 2023/3/1 17:32
  */
 @Slf4j
-@RequiredArgsConstructor
+@Component
 public class MyShiroRealm extends AuthorizingRealm {
     /* ============================= INSTANCE FIELDS ============================== */
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     /**
      * Retrieves the AuthorizationInfo for the given principals from the underlying data store.  When returning

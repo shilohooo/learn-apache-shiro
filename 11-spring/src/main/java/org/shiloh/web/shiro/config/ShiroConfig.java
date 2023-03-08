@@ -1,20 +1,18 @@
 package org.shiloh.web.shiro.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.RequiredArgsConstructor;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.session.mgt.ValidatingSessionManager;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
-import org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.shiloh.web.dao.MySessionDAO;
-import org.shiloh.web.service.UserService;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
 import org.shiloh.web.shiro.realm.MyShiroRealm;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
@@ -35,7 +33,6 @@ import java.util.Properties;
  * @date 2023/3/8 15:48
  */
 @Configuration
-@RequiredArgsConstructor
 public class ShiroConfig {
 
     /**
@@ -46,9 +43,7 @@ public class ShiroConfig {
     /**
      * 会话验证调度时间间隔：30分钟
      */
-    public static final int SESSION_VALIDATION_INTERVAL_MS = 1000 * 60 * 30;
-
-    private final UserService userService;
+    public static final int SESSION_VALIDATION_INTERVAL_MS = 1000 * 30;
 
     /**
      * 数据源配置
@@ -59,7 +54,7 @@ public class ShiroConfig {
      */
     @Bean
     public DataSource dataSource() {
-        final DruidDataSource druidDataSource = new DruidDataSource();
+        final DruidDataSource dataSource = new DruidDataSource();
         try (
                 final InputStream inputStream = ShiroConfig.class
                         .getClassLoader()
@@ -67,16 +62,16 @@ public class ShiroConfig {
         ) {
             final Properties properties = new Properties();
             properties.load(inputStream);
-            final DruidDataSource dataSource = new DruidDataSource();
             dataSource.setDriverClassName(properties.getProperty("jdbc.driver-class-name"));
             dataSource.setUrl(properties.getProperty("jdbc.url"));
             dataSource.setUsername(properties.getProperty("jdbc.username"));
             dataSource.setPassword(properties.getProperty("jdbc.password"));
+            System.out.println("dataSource url = " + dataSource.getUrl());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return druidDataSource;
+        return dataSource;
     }
 
     /**
@@ -93,20 +88,39 @@ public class ShiroConfig {
 
     /**
      * Ehcache 缓存管理器配置
+     * <p>
+     * 防止缓存名称冲突
+     *
+     * @return {@link CacheManager}
+     * @author shiloh
+     * @date 2023/3/8 22:06
+     */
+    @Bean
+    public CacheManager ehCacheManager() {
+        CacheManager cacheManager = CacheManager.getCacheManager("shiro-cache");
+        if (cacheManager == null) {
+            cacheManager = CacheManager.create(
+                    ShiroConfig.class.getClassLoader()
+                            .getResourceAsStream("shiro-ehcache.xml")
+            );
+        }
+
+        return cacheManager;
+    }
+
+    /**
+     * Ehcache 缓存管理器配置
      *
      * @return {@link org.apache.shiro.cache.ehcache.EhCacheManager}
      * @author shiloh
      * @date 2023/3/8 15:49
      */
     @Bean
-    public CacheManager cacheManager() {
-        CacheManager cacheManager = CacheManager.getCacheManager("shiro-cache");
-        if (cacheManager == null) {
-            cacheManager = CacheManager.create(
-                    ShiroConfig.class.getClassLoader().getResourceAsStream("shiro-ehcache.xml")
-            );
-        }
-        return cacheManager;
+    public org.apache.shiro.cache.CacheManager cacheManager() {
+        final EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager.setCacheManager(this.ehCacheManager());
+        ehCacheManager.setCacheManagerConfigFile("classpath:shiro-ehcache.xml");
+        return ehCacheManager;
     }
 
     /**
@@ -136,7 +150,7 @@ public class ShiroConfig {
      */
     @Bean
     public MyShiroRealm myShiroRealm() {
-        final MyShiroRealm myShiroRealm = new MyShiroRealm(this.userService);
+        final MyShiroRealm myShiroRealm = new MyShiroRealm();
         // 设置密码校验匹配器，支持重试次数限制
         myShiroRealm.setCredentialsMatcher(this.credentialsMatcher());
         // 开启缓存
@@ -179,22 +193,6 @@ public class ShiroConfig {
     }
 
     /**
-     * {@link org.apache.shiro.session.mgt.SessionValidationScheduler} 会话调度器配置
-     *
-     * @return {@link QuartzSessionValidationScheduler}
-     * @author shiloh
-     * @date 2023/3/8 16:41
-     */
-    @Bean
-    public SessionValidationScheduler sessionValidationScheduler() {
-        final QuartzSessionValidationScheduler scheduler = new QuartzSessionValidationScheduler();
-        // 设置调度时间间隔，单位：毫秒，默认为一个小时
-        scheduler.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL_MS);
-        scheduler.setSessionManager(this.sessionManager());
-        return scheduler;
-    }
-
-    /**
      * 会话管理器配置
      *
      * @author shiloh
@@ -208,10 +206,10 @@ public class ShiroConfig {
         sessionManager.setSessionDAO(this.sessionDAO());
         // 删除已失效的会话
         sessionManager.setDeleteInvalidSessions(true);
-        // 开启会话验证调度
+        // 开启会话验证调度，使用默认的调度器：ExecutorServiceSessionValidationScheduler
         sessionManager.setSessionValidationSchedulerEnabled(true);
-        // TODO 此处与 sessionValidationScheduler 形成了循环依赖，待解决
-        // sessionManager.setSessionValidationScheduler(this.sessionValidationScheduler());
+        // 设置会话验证调度时间间隔
+        sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL_MS);
         return sessionManager;
     }
 
@@ -225,7 +223,7 @@ public class ShiroConfig {
     public SecurityManager securityManager() {
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
         securityManager.setRealms(Collections.singletonList(this.myShiroRealm()));
-        // securityManager.setCacheManager(this.cacheManager());
+        securityManager.setCacheManager(this.cacheManager());
         securityManager.setSessionManager(this.sessionManager());
         return securityManager;
     }
@@ -243,5 +241,17 @@ public class ShiroConfig {
         factoryBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
         factoryBean.setArguments(this.securityManager());
         return factoryBean;
+    }
+
+    /**
+     * Shiro 生命周期处理器配置
+     *
+     * @return {@link LifecycleBeanPostProcessor}
+     * @author shiloh
+     * @date 2023/3/8 21:50
+     */
+    @Bean
+    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
     }
 }
