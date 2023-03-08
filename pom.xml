@@ -9,16 +9,6 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <properties>
-    <java.version>11</java.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.sourceEncoding>UTF-8</project.reporting.sourceEncoding>
-
-    <spring.deps.version>5.2.5.RELEASE</spring.deps.version>
-  </properties>
-
   <modules>
     <!--    身份认证-->
     <module>01-authentication</module>
@@ -41,6 +31,16 @@
     <!--    缓存-->
     <module>10-cache</module>
   </modules>
+
+  <properties>
+    <java.version>11</java.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.sourceEncoding>UTF-8</project.reporting.sourceEncoding>
+
+    <spring.deps.version>5.2.5.RELEASE</spring.deps.version>
+  </properties>
 
   <dependencies>
     <dependency>
