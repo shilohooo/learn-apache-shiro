@@ -32,6 +32,8 @@
     <module>10-cache</module>
     <!--    集成 Spring-->
     <module>11-spring</module>
+    <!--    Remember Me -->
+    <module>12-remember-me</module>
   </modules>
 
   <properties>
@@ -58,13 +60,13 @@
       <version>3.12.0</version>
     </dependency>
 
-<!--    shiro 相关依赖-->
+    <!--    shiro 相关依赖-->
 
-<!--    <dependency>-->
-<!--      <groupId>org.apache.shiro</groupId>-->
-<!--      <artifactId>shiro-all</artifactId>-->
-<!--      <version>${shiro.version}</version>-->
-<!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.apache.shiro</groupId>-->
+    <!--      <artifactId>shiro-all</artifactId>-->
+    <!--      <version>${shiro.version}</version>-->
+    <!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.shiro</groupId>
@@ -149,7 +151,6 @@
       <artifactId>javax.servlet-api</artifactId>
       <version>4.0.1</version>
     </dependency>
-
 
 
     <dependency>
