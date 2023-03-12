@@ -3,6 +3,7 @@ package org.shiloh.web;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.ViewResolver;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.view.JstlView;
         includeFilters = {@ComponentScan.Filter(classes = {ControllerAdvice.class})}
 )
 @EnableWebMvc
+@EnableAspectJAutoProxy
 public class ComponentScanConfig {
     /**
      * 视图解析器配置

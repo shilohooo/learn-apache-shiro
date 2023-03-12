@@ -12,6 +12,7 @@ import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
@@ -356,5 +357,22 @@ public class ShiroConfig {
         urlMappings.put("/**", DefaultFilter.user.name());
         shiroFilterFactoryBean.setFilterChainDefinitionMap(urlMappings);
         return shiroFilterFactoryBean;
+    }
+
+    /**
+     * Shiro 权限校验注解 AOP 支持配置
+     * <p>
+     * Shiro 提供了相应的注解用于权限控制，如果使用这些注解就需要使用 AOP 的功能来进行判断，
+     * 如 Spring AOP；Shiro 提供了 Spring AOP 集成用于权限注解的解析和验证。
+     *
+     * @return {@link AuthorizationAttributeSourceAdvisor}
+     * @author shiloh
+     * @date 2023/3/12 14:01
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor() {
+        final AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
+        advisor.setSecurityManager(this.securityManager());
+        return advisor;
     }
 }
