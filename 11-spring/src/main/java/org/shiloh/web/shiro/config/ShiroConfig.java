@@ -11,6 +11,7 @@ import org.apache.shiro.session.mgt.ValidatingSessionManager;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
+import org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.shiloh.web.dao.MySessionDAO;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
@@ -206,10 +207,14 @@ public class ShiroConfig {
         sessionManager.setSessionDAO(this.sessionDAO());
         // 删除已失效的会话
         sessionManager.setDeleteInvalidSessions(true);
-        // 开启会话验证调度，使用默认的调度器：ExecutorServiceSessionValidationScheduler
-        sessionManager.setSessionValidationSchedulerEnabled(true);
+        final QuartzSessionValidationScheduler scheduler = new QuartzSessionValidationScheduler();
         // 设置会话验证调度时间间隔
-        sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL_MS);
+        scheduler.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL_MS);
+        scheduler.setSessionManager(sessionManager);
+        // sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL_MS);
+        // 开启会话验证调度，使用 Shiro 提供的 Quartz 调度器
+        sessionManager.setSessionValidationSchedulerEnabled(true);
+        sessionManager.setSessionValidationScheduler(scheduler);
         return sessionManager;
     }
 
