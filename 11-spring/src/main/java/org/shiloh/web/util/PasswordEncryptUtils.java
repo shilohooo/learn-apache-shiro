@@ -49,4 +49,23 @@ public final class PasswordEncryptUtils {
                 .toHex();
         user.setPassword(newPassword);
     }
+
+    /**
+     * 用户密码加密，以及盐设置
+     *
+     * @param passwordPlaintext 明文密码
+     * @param salt              密码盐 - username + salt
+     * @return 加密后的密码（十六进制）
+     * @author shiloh
+     * @date 2023/3/1 16:32
+     */
+    public static String encryptPassword(String passwordPlaintext, String salt) {
+        return new SimpleHash(
+                ALGORITHM_NAME,
+                passwordPlaintext,
+                ByteSource.Util.bytes(salt),
+                HASH_ITERATIONS
+        )
+                .toHex();
+    }
 }

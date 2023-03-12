@@ -1,14 +1,17 @@
 package org.shiloh.web.shiro.credentials;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Element;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
-import org.apache.shiro.authc.SaltedAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.shiloh.web.entity.User;
+import org.shiloh.web.service.UserService;
+import org.shiloh.web.util.PasswordEncryptUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,8 +21,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author shiloh
  * @date 2023/2/28 17:05
  */
+@Slf4j
+@Component
 public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
     private final Cache<String, Element> passwordRetryCache;
+
+    @Autowired
+    private UserService userService;
 
     public RetryLimitHashCredentialsMatcher(CacheManager cacheManager) {
         this.passwordRetryCache = cacheManager.getCache("passwordRetryCache");
@@ -52,12 +60,18 @@ public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
             throw new ExcessiveAttemptsException();
         }
 
-
+        log.info("密码校验开始");
+        final User user = this.userService.findByUsername(username);
+        final String credentials = PasswordEncryptUtils.encryptPassword(
+                new String(((char[]) token.getCredentials())), user.getCredentialsSalt()
+        );
+        token = new UsernamePasswordToken(username, credentials);
         final boolean matchOrNot = super.doCredentialsMatch(token, info);
         if (matchOrNot) {
             // 清除重试次数
             this.passwordRetryCache.remove(username);
         }
+
         return matchOrNot;
     }
 

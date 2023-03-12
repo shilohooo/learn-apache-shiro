@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shiloh.web.ComponentScanConfig;
@@ -110,7 +109,7 @@ public class ShiroTests {
      * @author shiloh
      * @date 2023/3/1 17:04
      */
-    @Before
+    @Test
     public void setup() {
         // 清除旧数据
         this.jdbcTemplate.update(DELETE_ALL_USERS);
