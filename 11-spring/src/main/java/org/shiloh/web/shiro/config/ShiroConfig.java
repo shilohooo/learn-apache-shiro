@@ -331,8 +331,8 @@ public class ShiroConfig {
      * @author shiloh
      * @date 2023/3/12 11:05
      */
-    @Bean("shiroFilter")
-    public ShiroFilterFactoryBean shiroFilter() {
+    @Bean
+    public ShiroFilterFactoryBean shiroFilterFactoryBean() {
         final ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         // 注入安全管理器
         shiroFilterFactoryBean.setSecurityManager(this.securityManager());
