@@ -34,6 +34,8 @@
     <module>11-spring</module>
     <!--    Remember Me -->
     <module>12-remember-me</module>
+    <!--    SSL 集成-->
+    <module>13-ssl</module>
   </modules>
 
   <properties>
