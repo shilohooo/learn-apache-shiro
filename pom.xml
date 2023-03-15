@@ -36,6 +36,12 @@
     <module>12-remember-me</module>
     <!--    SSL 集成-->
     <module>13-ssl</module>
+    <!--    单点登录案例 - server-->
+    <module>14-sso-server</module>
+    <!--    单点登录案例 - 客户端-01-->
+    <module>14-sso-client-01</module>
+    <!--    单点登录案例 - 客户端-02-->
+    <module>14-sso-client-02</module>
   </modules>
 
   <properties>
@@ -173,25 +179,36 @@
       <artifactId>spring-test</artifactId>
       <version>${spring.deps.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.deps.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
       <version>${spring.deps.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <version>${spring.deps.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
       <version>${spring.deps.version}</version>
+    </dependency>
+
+    <!--    spring-data-->
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-redis</artifactId>
+      <version>2.3.3.RELEASE</version>
     </dependency>
 
     <!--    aspectj 相关依赖-->
