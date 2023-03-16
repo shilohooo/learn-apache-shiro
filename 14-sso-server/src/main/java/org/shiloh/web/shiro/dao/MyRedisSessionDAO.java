@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 重写 SessionDAO，使用 Redis 缓存 Session 实现会话共享
@@ -29,6 +30,7 @@ public class MyRedisSessionDAO extends CachingSessionDAO {
      * SessionId 缓存名称前缀
      */
     public static final String KEY_PREFIX = "shiro:session:";
+    public static final int DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 30;
 
     /* ======================== INSTANCE FIELD ========================== */
 
@@ -44,11 +46,15 @@ public class MyRedisSessionDAO extends CachingSessionDAO {
      */
     @Override
     protected void doUpdate(Session session) {
-        log.info("更新会话信息：{}", session);
-        final Serializable sessionId = this.generateSessionId(session);
-        this.assignSessionId(session, sessionId);
+        final Serializable sessionId = session.getId();
+        if (sessionId == null) {
+            return;
+        }
+        log.info("更新 id为：{}的会话信息：{}", sessionId, session);
+        // 重置过期时间
+        session.setTimeout(DEFAULT_SESSION_TIMEOUT);
         this.redisTemplate.opsForValue()
-                .set(KEY_PREFIX + sessionId, session);
+                .set(KEY_PREFIX + sessionId, session, DEFAULT_SESSION_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -58,11 +64,11 @@ public class MyRedisSessionDAO extends CachingSessionDAO {
      */
     @Override
     protected void doDelete(Session session) {
-        if (session == null) {
+        if (session.getId() == null) {
             return;
         }
 
-        log.info("删除会话信息：{}", session);
+        log.info("根据 id: {} 删除会话信息：{}", session.getId(), session);
         this.redisTemplate.delete(KEY_PREFIX + session.getId());
     }
 
@@ -75,15 +81,11 @@ public class MyRedisSessionDAO extends CachingSessionDAO {
      */
     @Override
     protected Serializable doCreate(Session session) {
-        if (session == null) {
-            throw new RuntimeException("无法创建空的会话信息");
-        }
-
-        log.info("创建会话信息：{}", session);
         final Serializable sessionId = this.generateSessionId(session);
+        log.info("创建会话信息：{}，id = {}", session, sessionId);
         this.assignSessionId(session, sessionId);
         this.redisTemplate.opsForValue()
-                .set(KEY_PREFIX + sessionId, session);
+                .set(KEY_PREFIX + sessionId, session, DEFAULT_SESSION_TIMEOUT, TimeUnit.MILLISECONDS);
         return session.getId();
     }
 

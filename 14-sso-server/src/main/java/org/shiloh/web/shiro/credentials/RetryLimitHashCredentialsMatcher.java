@@ -1,14 +1,13 @@
 package org.shiloh.web.shiro.credentials;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Element;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.shiloh.web.entity.User;
 import org.shiloh.web.service.UserService;
+import org.shiloh.web.shiro.cache.ShiroRedisCacheManager;
 import org.shiloh.web.util.PasswordEncryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,13 +23,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
-    private final Cache<String, Element> passwordRetryCache;
+    public static final String PASSWORD_RETRY_CACHE_NAME = "passwordRetryCache";
+
+    private final Cache<String, AtomicInteger> passwordRetryCache;
 
     @Autowired
     private UserService userService;
 
-    public RetryLimitHashCredentialsMatcher(CacheManager cacheManager) {
-        this.passwordRetryCache = cacheManager.getCache("passwordRetryCache");
+    public RetryLimitHashCredentialsMatcher(ShiroRedisCacheManager shiroRedisCacheManager) {
+        this.passwordRetryCache = shiroRedisCacheManager.getCache(PASSWORD_RETRY_CACHE_NAME);
     }
 
 
@@ -49,12 +50,11 @@ public class RetryLimitHashCredentialsMatcher extends HashedCredentialsMatcher {
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
         final String username = (String) token.getPrincipal();
         // 重试次数 + 1
-        Element element = this.passwordRetryCache.get(username);
-        if (element == null) {
-            element = new Element(username, new AtomicInteger(0));
-            this.passwordRetryCache.put(username, element);
+        AtomicInteger retryCount = this.passwordRetryCache.get(username);
+        if (retryCount == null) {
+            retryCount = new AtomicInteger(0);
+            this.passwordRetryCache.put(username, retryCount);
         }
-        final AtomicInteger retryCount = (AtomicInteger) element.getObjectValue();
         if (retryCount.incrementAndGet() > 5) {
             // 重试次数大于 5 次，抛出异常
             throw new ExcessiveAttemptsException();

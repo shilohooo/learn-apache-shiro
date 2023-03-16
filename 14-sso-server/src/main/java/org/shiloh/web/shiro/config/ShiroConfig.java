@@ -2,8 +2,6 @@ package org.shiloh.web.shiro.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.ValidatingSessionManager;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
@@ -15,22 +13,23 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
-import org.apache.shiro.web.filter.authz.SslFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilter;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.shiloh.web.shiro.cache.RedisCacheManager;
+import org.shiloh.web.shiro.cache.ShiroRedisCacheManager;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
 import org.shiloh.web.shiro.dao.MyRedisSessionDAO;
-import org.shiloh.web.shiro.dao.MySessionDAO;
 import org.shiloh.web.shiro.filter.MyFormAuthenticationFilter;
 import org.shiloh.web.shiro.realm.MyShiroRealm;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.servlet.Filter;
@@ -57,11 +56,6 @@ public class ShiroConfig {
      * 会话验证调度时间间隔：30秒
      */
     public static final int SESSION_VALIDATION_INTERVAL_MS = 1000 * 30;
-
-    /**
-     * RememberMeCookie 有效期：30天，单位：秒
-     */
-    public static final int REMEMBER_ME_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
     /**
      * 数据源配置
@@ -103,52 +97,37 @@ public class ShiroConfig {
         return new JdbcTemplate(this.dataSource());
     }
 
-    // /**
-    //  * Ehcache 缓存管理器配置
-    //  * <p>
-    //  * 防止缓存名称冲突
-    //  *
-    //  * @return {@link CacheManager}
-    //  * @author shiloh
-    //  * @date 2023/3/8 22:06
-    //  */
-    // @Bean
-    // public CacheManager ehCacheManager() {
-    //     CacheManager cacheManager = CacheManager.getCacheManager("shiro-cache");
-    //     if (cacheManager == null) {
-    //         cacheManager = CacheManager.create(
-    //                 ShiroConfig.class.getClassLoader()
-    //                         .getResourceAsStream("shiro-ehcache.xml")
-    //         );
-    //     }
-    //
-    //     return cacheManager;
-    // }
-
-    // /**
-    //  * Ehcache 缓存管理器配置
-    //  *
-    //  * @return {@link EhCacheManager}
-    //  * @author shiloh
-    //  * @date 2023/3/8 15:49
-    //  */
-    // @Bean
-    // public org.apache.shiro.cache.CacheManager cacheManager() {
-    //     final EhCacheManager ehCacheManager = new EhCacheManager();
-    //     ehCacheManager.setCacheManager(this.ehCacheManager());
-    //     ehCacheManager.setCacheManagerConfigFile("classpath:shiro-ehcache.xml");
-    //     return ehCacheManager;
-    // }
-
     /**
-     * Redis 缓存管理器配置
+     * 连接工厂配置
      *
+     * @return {@link org.springframework.data.redis.connection.jedis.JedisConnectionFactory}
      * @author shiloh
-     * @date 2023/3/15 20:58
+     * @date 2023/3/15 18:45
      */
     @Bean
-    public RedisCacheManager cacheManager() {
-        return new RedisCacheManager();
+    public JedisConnectionFactory jedisConnectionFactory() {
+        final RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(
+                "127.0.0.1", 16379
+        );
+        return new JedisConnectionFactory(configuration);
+    }
+
+    /**
+     * RedisTemplate 配置
+     *
+     * @return {@link RedisTemplate}
+     * @author shiloh
+     * @date 2023/3/15 18:47
+     */
+    @Bean
+    public RedisTemplate<?, ?> redisTemplate() {
+        final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(this.jedisConnectionFactory());
+        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setValueSerializer(RedisSerializer.java());
+        redisTemplate.setHashKeySerializer(RedisSerializer.string());
+        redisTemplate.setHashValueSerializer(RedisSerializer.java());
+        return redisTemplate;
     }
 
     /**
@@ -159,9 +138,9 @@ public class ShiroConfig {
      * @date 2023/3/8 15:59
      */
     @Bean
-    public CredentialsMatcher credentialsMatcher() {
+    public CredentialsMatcher credentialsMatcher(ShiroRedisCacheManager shiroRedisCacheManager) {
         final RetryLimitHashCredentialsMatcher credentialsMatcher = new RetryLimitHashCredentialsMatcher(
-                this.cacheManager()
+                shiroRedisCacheManager
         );
         credentialsMatcher.setHashAlgorithmName("md5");
         credentialsMatcher.setStoredCredentialsHexEncoded(true);
@@ -177,20 +156,20 @@ public class ShiroConfig {
      * @date 2023/3/8 16:29
      */
     @Bean
-    public MyShiroRealm myShiroRealm() {
+    public MyShiroRealm myShiroRealm(ShiroRedisCacheManager shiroRedisCacheManager) {
         final MyShiroRealm myShiroRealm = new MyShiroRealm();
         // 设置密码校验匹配器，支持重试次数限制
-        myShiroRealm.setCredentialsMatcher(this.credentialsMatcher());
+        myShiroRealm.setCredentialsMatcher(this.credentialsMatcher(shiroRedisCacheManager));
         // 开启缓存
-        myShiroRealm.setCachingEnabled(true);
+        myShiroRealm.setCachingEnabled(false);
         // 开启身份验证缓存
-        myShiroRealm.setAuthenticationCachingEnabled(true);
+        myShiroRealm.setAuthenticationCachingEnabled(false);
         // 设置身份验证缓存的缓存名称
-        myShiroRealm.setAuthenticationCacheName("authenticationCache");
+        // myShiroRealm.setAuthenticationCacheName(AUTHENTICATION_CACHE_NAME);
         // 开始授权缓存
-        myShiroRealm.setAuthorizationCachingEnabled(true);
+        myShiroRealm.setAuthorizationCachingEnabled(false);
         // 设置授权缓存的缓存名称
-        myShiroRealm.setAuthorizationCacheName("authorizationCache");
+        // myShiroRealm.setAuthorizationCacheName(AUTHORIZATION_CACHE_NAME);
         return myShiroRealm;
     }
 
@@ -205,26 +184,6 @@ public class ShiroConfig {
     public SessionIdGenerator sessionIdGenerator() {
         return new JavaUuidSessionIdGenerator();
     }
-
-    /**
-     * {@link SessionDAO} 配置
-     *
-     * @return {@link MySessionDAO}
-     * @author shiloh
-     * @date 2023/3/8 16:39
-     */
-    // @Bean
-    // public SessionDAO sessionDAO() {
-    //     // final MySessionDAO mySessionDAO = new MySessionDAO(this.jdbcTemplate());
-    //
-    //     // web集成
-    //     final EnterpriseCacheSessionDAO sessionDAO = new EnterpriseCacheSessionDAO();
-    //     // 注入 sessionId 生成组件
-    //     sessionDAO.setSessionIdGenerator(this.sessionIdGenerator());
-    //     // 设置缓存名称 - 对应 ehcache 配置文件中的 name 属性
-    //     sessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
-    //     return sessionDAO;
-    // }
 
     /**
      * SessionDAO 配置
@@ -260,40 +219,6 @@ public class ShiroConfig {
         simpleCookie.setMaxAge(-1);
 
         return simpleCookie;
-    }
-
-    /**
-     * Remember Me Cookie 配置
-     *
-     * @return {@link SimpleCookie}
-     * @author shiloh
-     * @date 2023/3/12 14:50
-     */
-    @Bean
-    public Cookie rememberMeCookie() {
-        final SimpleCookie rememberMeCookie = new SimpleCookie("rememberMeCookie");
-        rememberMeCookie.setHttpOnly(true);
-        // 设置 Cookie 有效期为 30 天
-        rememberMeCookie.setMaxAge(REMEMBER_ME_COOKIE_MAX_AGE);
-
-        return rememberMeCookie;
-    }
-
-    /**
-     * RememberMe 管理器配置
-     *
-     * @return {@link CookieRememberMeManager}
-     * @author shiloh
-     * @date 2023/3/12 14:55
-     */
-    @Bean
-    public RememberMeManager rememberMeManager() {
-        final CookieRememberMeManager manager = new CookieRememberMeManager();
-        manager.setCookie(this.rememberMeCookie());
-        // 设置加密 RememberMeCookie 的密钥，默认使用的 AES 加密算法
-        manager.setCipherKey(new SecureRandomNumberGenerator().nextBytes(16).getBytes());
-
-        return manager;
     }
 
     /**
@@ -335,16 +260,18 @@ public class ShiroConfig {
      * @date 2023/3/8 16:49
      */
     @Bean
-    public SecurityManager securityManager() {
+    public SecurityManager securityManager(ShiroRedisCacheManager shiroRedisCacheManager) {
         // final DefaultSecurityManager securityManager = new DefaultSecurityManager();
 
         // web 集成
         final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealms(Collections.singletonList(this.myShiroRealm()));
-        securityManager.setCacheManager(this.cacheManager());
+        securityManager.setRealms(Collections.singletonList(this.myShiroRealm(shiroRedisCacheManager)));
+        // 如果使用 redis 共享session，这个必须设置，因为集群之中 session要共享，同样一些缓存的数据也要共享
+        // 比如shiro缓存的身份验证数据、权限信息
+        securityManager.setCacheManager(shiroRedisCacheManager);
         securityManager.setSessionManager(this.sessionManager());
         // 设置 RememberMe 管理器
-        securityManager.setRememberMeManager(this.rememberMeManager());
+        // securityManager.setRememberMeManager(this.rememberMeManager());
         return securityManager;
     }
 
@@ -356,10 +283,10 @@ public class ShiroConfig {
      * @date 2023/3/8 16:53
      */
     @Bean
-    public MethodInvokingFactoryBean methodInvokingFactoryBean() {
+    public MethodInvokingFactoryBean methodInvokingFactoryBean(ShiroRedisCacheManager shiroRedisCacheManager) {
         final MethodInvokingFactoryBean factoryBean = new MethodInvokingFactoryBean();
         factoryBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
-        factoryBean.setArguments(this.securityManager());
+        factoryBean.setArguments(this.securityManager(shiroRedisCacheManager));
         return factoryBean;
     }
 
@@ -396,31 +323,16 @@ public class ShiroConfig {
     }
 
     /**
-     * SSL 过滤器配置
-     *
-     * @return {@link SslFilter}
-     * @author shiloh
-     * @date 2023/3/13 22:16
-     */
-    @Bean
-    public SslFilter sslFilter() {
-        final SslFilter sslFilter = new SslFilter();
-        // 端口设置
-        sslFilter.setPort(8443);
-        return sslFilter;
-    }
-
-    /**
      * Shiro Web 过滤器配置
      *
      * @author shiloh
      * @date 2023/3/12 11:05
      */
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean() {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(ShiroRedisCacheManager shiroRedisCacheManager) {
         final ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         // 注入安全管理器
-        shiroFilterFactoryBean.setSecurityManager(this.securityManager());
+        shiroFilterFactoryBean.setSecurityManager(this.securityManager(shiroRedisCacheManager));
         // 设置登录页面跳转地址
         shiroFilterFactoryBean.setLoginUrl("/login.jsp");
         // 设置未授权访问跳转地址
@@ -431,7 +343,7 @@ public class ShiroConfig {
         final Map<String, Filter> filterMap = new HashMap<>();
         filterMap.put(DefaultFilter.authc.name(), this.formAuthenticationFilter());
         // 添加 SSL 过滤器
-        filterMap.put(DefaultFilter.ssl.name(), this.sslFilter());
+        // filterMap.put(DefaultFilter.ssl.name(), this.sslFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
         // 添加 url 拦截与过滤器的映射关系
         // 注意：这里需要使用有序的 map，保证执行顺序
@@ -439,7 +351,7 @@ public class ShiroConfig {
         urlMappings.put("/index.jsp", DefaultFilter.anon.name());
         urlMappings.put("/unauthorized.jsp", DefaultFilter.anon.name());
         // 访问登录页面需要走 SSL
-        urlMappings.put("/login.jsp", DefaultFilter.ssl.name() + "," + DefaultFilter.authc.name());
+        urlMappings.put("/login.jsp", DefaultFilter.authc.name());
         // authc 过滤器：必须通过身份验证才能访问
         urlMappings.put("/authenticated.jsp", DefaultFilter.authc.name());
         urlMappings.put("/logout", DefaultFilter.logout.name());
@@ -460,9 +372,9 @@ public class ShiroConfig {
      * @date 2023/3/12 14:01
      */
     @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor() {
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(ShiroRedisCacheManager shiroRedisCacheManager) {
         final AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
-        advisor.setSecurityManager(this.securityManager());
+        advisor.setSecurityManager(this.securityManager(shiroRedisCacheManager));
         return advisor;
     }
 }
