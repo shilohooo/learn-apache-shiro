@@ -1,9 +1,7 @@
 package org.shiloh.web.shiro.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -24,6 +22,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.shiloh.web.shiro.cache.RedisCacheManager;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
 import org.shiloh.web.shiro.dao.MyRedisSessionDAO;
 import org.shiloh.web.shiro.dao.MySessionDAO;
@@ -104,41 +103,52 @@ public class ShiroConfig {
         return new JdbcTemplate(this.dataSource());
     }
 
+    // /**
+    //  * Ehcache 缓存管理器配置
+    //  * <p>
+    //  * 防止缓存名称冲突
+    //  *
+    //  * @return {@link CacheManager}
+    //  * @author shiloh
+    //  * @date 2023/3/8 22:06
+    //  */
+    // @Bean
+    // public CacheManager ehCacheManager() {
+    //     CacheManager cacheManager = CacheManager.getCacheManager("shiro-cache");
+    //     if (cacheManager == null) {
+    //         cacheManager = CacheManager.create(
+    //                 ShiroConfig.class.getClassLoader()
+    //                         .getResourceAsStream("shiro-ehcache.xml")
+    //         );
+    //     }
+    //
+    //     return cacheManager;
+    // }
+
+    // /**
+    //  * Ehcache 缓存管理器配置
+    //  *
+    //  * @return {@link EhCacheManager}
+    //  * @author shiloh
+    //  * @date 2023/3/8 15:49
+    //  */
+    // @Bean
+    // public org.apache.shiro.cache.CacheManager cacheManager() {
+    //     final EhCacheManager ehCacheManager = new EhCacheManager();
+    //     ehCacheManager.setCacheManager(this.ehCacheManager());
+    //     ehCacheManager.setCacheManagerConfigFile("classpath:shiro-ehcache.xml");
+    //     return ehCacheManager;
+    // }
+
     /**
-     * Ehcache 缓存管理器配置
-     * <p>
-     * 防止缓存名称冲突
+     * Redis 缓存管理器配置
      *
-     * @return {@link CacheManager}
      * @author shiloh
-     * @date 2023/3/8 22:06
+     * @date 2023/3/15 20:58
      */
     @Bean
-    public CacheManager ehCacheManager() {
-        CacheManager cacheManager = CacheManager.getCacheManager("shiro-cache");
-        if (cacheManager == null) {
-            cacheManager = CacheManager.create(
-                    ShiroConfig.class.getClassLoader()
-                            .getResourceAsStream("shiro-ehcache.xml")
-            );
-        }
-
-        return cacheManager;
-    }
-
-    /**
-     * Ehcache 缓存管理器配置
-     *
-     * @return {@link EhCacheManager}
-     * @author shiloh
-     * @date 2023/3/8 15:49
-     */
-    @Bean
-    public org.apache.shiro.cache.CacheManager cacheManager() {
-        final EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager(this.ehCacheManager());
-        ehCacheManager.setCacheManagerConfigFile("classpath:shiro-ehcache.xml");
-        return ehCacheManager;
+    public RedisCacheManager cacheManager() {
+        return new RedisCacheManager();
     }
 
     /**
@@ -225,7 +235,10 @@ public class ShiroConfig {
      */
     @Bean
     public SessionDAO sessionDAO() {
-        return new MyRedisSessionDAO();
+        final MyRedisSessionDAO redisSessionDAO = new MyRedisSessionDAO();
+        // 注入 sessionId 生成组件
+        redisSessionDAO.setSessionIdGenerator(this.sessionIdGenerator());
+        return redisSessionDAO;
     }
 
     /**
