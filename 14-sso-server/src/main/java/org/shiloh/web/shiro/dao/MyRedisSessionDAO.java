@@ -13,6 +13,9 @@ import java.util.*;
 
 /**
  * 重写 SessionDAO，使用 Redis 缓存 Session 实现会话共享
+ * <p>
+ * {@link org.apache.shiro.session.mgt.eis.SessionDAO} 用于管理 Shiro 中的会话信息，
+ * 定义了对 {@link Session} 的 CRUD 操作
  *
  * @author shiloh
  * @date 2023/3/15 18:44
