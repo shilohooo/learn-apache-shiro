@@ -27,6 +27,7 @@ public class ShiroRedisCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key) throws CacheException {
+        log.info("根据 key: {} 获取 shiro 缓存的数据", key);
         return this.redisTemplate.opsForValue().get(KEY_PREFIX + key);
     }
 
@@ -36,6 +37,8 @@ public class ShiroRedisCache<K, V> implements Cache<K, V> {
             log.warn("无法将 null 值添加到缓存中");
             return null;
         }
+
+        log.info("根据 key：{} 设置 shiro 缓存数据：{}", key, val);
         this.redisTemplate.opsForValue().set(key, val);
         return val;
     }
