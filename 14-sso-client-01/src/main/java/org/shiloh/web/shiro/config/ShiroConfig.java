@@ -3,7 +3,6 @@ package org.shiloh.web.shiro.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.ValidatingSessionManager;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -22,7 +21,6 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.shiloh.web.shiro.cache.ShiroRedisCacheManager;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
 import org.shiloh.web.shiro.dao.MyRedisSessionDAO;
-import org.shiloh.web.shiro.factory.MyShiroSessionFactory;
 import org.shiloh.web.shiro.filter.MyFormAuthenticationFilter;
 import org.shiloh.web.shiro.realm.MyShiroRealm;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
@@ -102,7 +100,7 @@ public class ShiroConfig {
     /**
      * 连接工厂配置
      *
-     * @return {@link org.springframework.data.redis.connection.jedis.JedisConnectionFactory}
+     * @return {@link JedisConnectionFactory}
      * @author shiloh
      * @date 2023/3/15 18:45
      */
@@ -224,17 +222,6 @@ public class ShiroConfig {
     }
 
     /**
-     * 自定义 SessionFactory 配置
-     * @return {@link MyShiroSessionFactory}
-     * @author shiloh
-     * @date 2023/3/17 17:26
-     */
-    @Bean
-    public SessionFactory sessionFactory() {
-        return new MyShiroSessionFactory();
-    }
-
-    /**
      * 会话管理器配置
      *
      * @author shiloh
@@ -246,7 +233,6 @@ public class ShiroConfig {
 
         // web 集成
         final DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-        sessionManager.setSessionFactory(this.sessionFactory());
         // 设置全局会话超时时间，默认为：半个小时
         sessionManager.setGlobalSessionTimeout(GLOBAL_SESSION_TIMEOUT_MS);
         sessionManager.setSessionDAO(this.sessionDAO());

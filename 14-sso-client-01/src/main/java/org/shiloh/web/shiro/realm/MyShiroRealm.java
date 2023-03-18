@@ -1,20 +1,15 @@
 package org.shiloh.web.shiro.realm;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.shiloh.web.entity.User;
 import org.shiloh.web.service.UserService;
-import org.shiloh.web.shiro.dao.MyRedisSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,18 +76,6 @@ public class MyShiroRealm extends AuthorizingRealm {
             // 帐号已被锁定
             throw new LockedAccountException();
         }
-
-        // 单用户登录判断
-        final DefaultWebSecurityManager securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
-        final DefaultWebSessionManager sessionManager = (DefaultWebSessionManager) securityManager.getSessionManager();
-        final MyRedisSessionDAO sessionDAO = (MyRedisSessionDAO) sessionManager.getSessionDAO();
-        // 判断用户是否存在已登录的会话，如果是则删除
-        final Session loggedSession = sessionDAO.getSessionByUsername(username);
-        if (loggedSession != null) {
-            sessionDAO.delete(loggedSession);
-        }
-
-
         log.info("login password = {}", user.getPassword());
         // 交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以在此判断或自定义实现
         return new SimpleAuthenticationInfo(
