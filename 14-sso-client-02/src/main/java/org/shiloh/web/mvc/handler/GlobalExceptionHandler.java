@@ -1,7 +1,6 @@
 package org.shiloh.web.mvc.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -27,14 +26,14 @@ public class GlobalExceptionHandler {
      * @author shiloh
      * @date 2023/3/12 12:35
      */
-    @ExceptionHandler(IncorrectCredentialsException.class)
-    public ModelAndView handleIncorrectCredentialsException(IncorrectCredentialsException e) {
-        log.error("密码错误：", e);
-        final ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("error", "用户名/密码错误");
-        modelAndView.setViewName("login");
-        return modelAndView;
-    }
+    // @ExceptionHandler(IncorrectCredentialsException.class)
+    // public ModelAndView handleIncorrectCredentialsException(IncorrectCredentialsException e) {
+    //     log.error("密码错误：", e);
+    //     final ModelAndView modelAndView = new ModelAndView();
+    //     modelAndView.addObject("error", "用户名/密码错误");
+    //     modelAndView.setViewName("login");
+    //     return modelAndView;
+    // }
 
     /**
      * 无权限异常处理：跳转都提示页面

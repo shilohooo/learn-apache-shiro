@@ -3,6 +3,7 @@ package org.shiloh.web.shiro.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.shiloh.web.shiro.session.MyShiroSession;
@@ -117,6 +118,7 @@ public class MyRedisSessionDAO extends CachingSessionDAO {
         this.redisTemplate.opsForValue()
                 .set(SESSION_ID_KEY_PREFIX + sessionId, session, DEFAULT_SESSION_TIMEOUT, TimeUnit.MILLISECONDS);
         final MyShiroSession myShiroSession = (MyShiroSession) session;
+        myShiroSession.setUsername((String) SecurityUtils.getSubject().getPrincipal());
         // 如果用户不是匿名登录，则更新用户名与 session id 的关联缓存
         if (StringUtils.isNotBlank(myShiroSession.getUsername())) {
             this.redisTemplate.opsForValue()

@@ -17,6 +17,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.shiloh.web.shiro.cache.ShiroRedisCacheManager;
@@ -212,13 +213,14 @@ public class ShiroConfig {
     @Bean
     public Cookie sessionIdCookie() {
         // 实例化时指定 cookie 的名称
-        final SimpleCookie simpleCookie = new SimpleCookie("myShiroSessionCookie");
+        final SimpleCookie simpleCookie = new SimpleCookie(ShiroHttpSession.DEFAULT_SESSION_ID_NAME);
         // 开启 httpOnly
         simpleCookie.setHttpOnly(true);
         // 设置有效期，单位：秒，这里设置为一天
         // simpleCookie.setMaxAge(COOKIE_MAX_AGE);
         // -1 表示当用户关闭浏览器时，Cookie 才会失效
         simpleCookie.setMaxAge(-1);
+        simpleCookie.setPath("/");
 
         return simpleCookie;
     }
@@ -246,6 +248,8 @@ public class ShiroConfig {
 
         // web 集成
         final DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        // 禁用：把 JSESSIONID 放到地址栏后面
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
         sessionManager.setSessionFactory(this.sessionFactory());
         // 设置全局会话超时时间，默认为：半个小时
         sessionManager.setGlobalSessionTimeout(GLOBAL_SESSION_TIMEOUT_MS);

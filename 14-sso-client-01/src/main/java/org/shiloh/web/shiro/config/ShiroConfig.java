@@ -3,6 +3,7 @@ package org.shiloh.web.shiro.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.ValidatingSessionManager;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -16,13 +17,15 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.servlet.SimpleCookie;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.shiloh.web.shiro.cache.ShiroRedisCacheManager;
 import org.shiloh.web.shiro.credentials.RetryLimitHashCredentialsMatcher;
 import org.shiloh.web.shiro.dao.MyRedisSessionDAO;
+import org.shiloh.web.shiro.factory.MyShiroSessionFactory;
 import org.shiloh.web.shiro.filter.MyFormAuthenticationFilter;
 import org.shiloh.web.shiro.realm.MyShiroRealm;
+import org.shiloh.web.shiro.session.MyShiroWebSessionManager;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +59,11 @@ public class ShiroConfig {
      * 会话验证调度时间间隔：30秒
      */
     public static final int SESSION_VALIDATION_INTERVAL_MS = 1000 * 30;
+
+    /**
+     * 单点登录服务 - 登录地址
+     */
+    public static final String SSO_SERVER_LOGIN_URL = "http://www.shiloh.com/sso-server/login.jsp";
 
     /**
      * 数据源配置
@@ -210,15 +218,27 @@ public class ShiroConfig {
     @Bean
     public Cookie sessionIdCookie() {
         // 实例化时指定 cookie 的名称
-        final SimpleCookie simpleCookie = new SimpleCookie("myShiroSessionCookie");
+        final SimpleCookie simpleCookie = new SimpleCookie(ShiroHttpSession.DEFAULT_SESSION_ID_NAME);
         // 开启 httpOnly
         simpleCookie.setHttpOnly(true);
         // 设置有效期，单位：秒，这里设置为一天
         // simpleCookie.setMaxAge(COOKIE_MAX_AGE);
         // -1 表示当用户关闭浏览器时，Cookie 才会失效
         simpleCookie.setMaxAge(-1);
+        simpleCookie.setPath("/");
 
         return simpleCookie;
+    }
+
+    /**
+     * 自定义 SessionFactory 配置
+     * @return {@link MyShiroSessionFactory}
+     * @author shiloh
+     * @date 2023/3/17 17:26
+     */
+    @Bean
+    public SessionFactory sessionFactory() {
+        return new MyShiroSessionFactory();
     }
 
     /**
@@ -232,7 +252,10 @@ public class ShiroConfig {
         // final DefaultSessionManager sessionManager = new DefaultSessionManager();
 
         // web 集成
-        final DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        final MyShiroWebSessionManager sessionManager = new MyShiroWebSessionManager();
+        // 禁用：把 JSESSIONID 放到地址栏后面
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
+        sessionManager.setSessionFactory(this.sessionFactory());
         // 设置全局会话超时时间，默认为：半个小时
         sessionManager.setGlobalSessionTimeout(GLOBAL_SESSION_TIMEOUT_MS);
         sessionManager.setSessionDAO(this.sessionDAO());
@@ -317,7 +340,7 @@ public class ShiroConfig {
         filter.setPasswordParam("password");
         filter.setRememberMeParam("rememberMe");
         // 设置登录页面跳转地址
-        filter.setLoginUrl("/login.jsp");
+        filter.setLoginUrl(SSO_SERVER_LOGIN_URL);
 
         return filter;
     }
@@ -333,12 +356,12 @@ public class ShiroConfig {
         final ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         // 注入安全管理器
         shiroFilterFactoryBean.setSecurityManager(this.securityManager(shiroRedisCacheManager));
-        // 设置登录页面跳转地址
-        shiroFilterFactoryBean.setLoginUrl("/login.jsp");
+        // 设置登录页面跳转地址，默认为：/login.jsp
+        shiroFilterFactoryBean.setLoginUrl(SSO_SERVER_LOGIN_URL);
         // 设置未授权访问跳转地址
         shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized.jsp");
         // 设置登录成功的跳转地址
-        shiroFilterFactoryBean.setSuccessUrl("/index.jsp");
+        // shiroFilterFactoryBean.setSuccessUrl("/index.jsp");
         // 添加过滤器
         final Map<String, Filter> filterMap = new HashMap<>();
         filterMap.put(DefaultFilter.authc.name(), this.formAuthenticationFilter());
