@@ -145,6 +145,7 @@ public class EhCacheManager implements CacheManager, Initializable, Destroyable 
      *
      * @param name the name of the cache to load/create.
      */
+    @Override
     public final <K, V> Cache<K, V> getCache(String name) throws CacheException {
 
         if (log.isTraceEnabled()) {
@@ -169,7 +170,7 @@ public class EhCacheManager implements CacheManager, Initializable, Destroyable 
                     log.info("Using existing EHCache named [" + cache.getName() + "]");
                 }
             }
-            return new EhCache<K, V>(cache);
+            return new EhCache<>(cache);
         } catch (net.sf.ehcache.CacheException e) {
             throw new CacheException(e);
         }
@@ -194,6 +195,7 @@ public class EhCacheManager implements CacheManager, Initializable, Destroyable 
      *          if there are any CacheExceptions thrown by EhCache.
      * @see net.sf.ehcache.CacheManager#create
      */
+    @Override
     public final void init() throws CacheException {
         ensureCacheManager();
     }
@@ -231,6 +233,7 @@ public class EhCacheManager implements CacheManager, Initializable, Destroyable 
      * a non-null CacheManager into this instance before calling {@link #init() init}, this instance expects that same
      * component to also destroy the CacheManager instance, and it will not attempt to do so.
      */
+    @Override
     public void destroy() {
         if (cacheManagerImplicitlyCreated) {
             try {
