@@ -44,6 +44,8 @@
     <module>14-sso-client-02</module>
     <!--    oauth2 - 集成 apache-oltu-->
     <module>15-oauth2</module>
+    <!--    oauth2 客户端 - 集成 apache-oltu-->
+    <module>15-oauth2-client</module>
   </modules>
 
   <properties>
@@ -309,6 +311,15 @@
         <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
         <version>${apache-oltu.version}</version>
       </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client -->
+      <!--      OAuth2 客户端-->
+      <dependency>
+        <groupId>org.apache.oltu.oauth2</groupId>
+        <artifactId>org.apache.oltu.oauth2.client</artifactId>
+        <version>${apache-oltu.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
