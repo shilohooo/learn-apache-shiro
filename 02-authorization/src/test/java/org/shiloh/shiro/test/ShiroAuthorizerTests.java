@@ -2,7 +2,6 @@ package org.shiloh.shiro.test;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -25,8 +24,8 @@ public class ShiroAuthorizerTests extends BaseShiroTests {
     @Test
     public void testIsPermitted() {
         // login
-        final String username = "zhang";
-        final String password = "123";
+        final String username = "shiloh";
+        final String password = "123456";
         super.login("classpath:shiro/config/shiro-authorizer.ini", username, password);
 
         final Subject subject = SecurityUtils.getSubject();
