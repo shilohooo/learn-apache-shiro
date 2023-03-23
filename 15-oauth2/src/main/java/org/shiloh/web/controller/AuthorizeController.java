@@ -77,6 +77,7 @@ public class AuthorizeController {
                 // 尝试登录
                 if (!this.login(subject, request)) {
                     // 登录失败时跳转回登录页面
+                    log.info("登录失败，跳转回登录页面");
                     final Client client = this.clientService.findByClientId(oAuthAuthzRequest.getClientId());
                     model.addAttribute("client", client);
                     return "oauth2-login";
@@ -86,11 +87,14 @@ public class AuthorizeController {
             final String username = (String) subject.getPrincipal();
             String authCode = null;
             final String responseType = oAuthAuthzRequest.getParam(OAuth.OAUTH_RESPONSE_TYPE);
-            if (ResponseType.CODE.name().equals(responseType)) {
+            log.info("responseType: {}", responseType);
+            if (ResponseType.CODE.toString().equals(responseType)) {
+                log.info("生成授权码");
                 final OAuthIssuerImpl oAuthIssuer = new OAuthIssuerImpl(new MD5Generator());
                 authCode = oAuthIssuer.authorizationCode();
                 this.oAuthService.addAuthCode(authCode, username);
             }
+            log.info("生成的授权码为：{}", authCode);
             // 构建OAuth响应
             final OAuthASResponse.OAuthAuthorizationResponseBuilder builder = OAuthASResponse.authorizationResponse(
                     request, HttpServletResponse.SC_FOUND
@@ -144,6 +148,7 @@ public class AuthorizeController {
 
         final UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         try {
+            log.info("登录成功");
             subject.login(token);
             return true;
         } catch (Exception e) {

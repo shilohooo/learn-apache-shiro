@@ -102,7 +102,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         log.info("OAuth2AuthenticationFilter.isAccessAllowed");
-        return true;
+        return false;
     }
 
     /**
@@ -118,6 +118,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
      */
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        log.info("OAuth2AuthenticationFilter.onAccessDenied");
         // 获取错误信息
         final HttpServletRequest req = (HttpServletRequest) request;
         final String error = req.getParameter(this.errorParam);
@@ -137,6 +138,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
         if (!subject.isAuthenticated()) {
             // 没有进行身份验证，判断是否有授权码，如果没有则重定向到服务端授权
             if (StringUtils.isBlank(req.getParameter(this.authCodeParam))) {
+                log.info("重定向到服务端登录地址");
                 this.saveRequestAndRedirectToLogin(request, response);
                 return false;
             }

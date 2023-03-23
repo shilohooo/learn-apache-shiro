@@ -195,6 +195,7 @@ public class ShiroConfig {
         // 开启 session id cookie
         sessionManager.setSessionIdCookieEnabled(true);
         sessionManager.setSessionIdCookie(this.sessionIdCookie());
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
         return sessionManager;
     }
 
@@ -209,6 +210,7 @@ public class ShiroConfig {
         final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setSessionManager(this.sessionManager());
         securityManager.setCacheManager(this.cacheManager());
+        securityManager.setRealm(this.oAuth2Realm());
         return securityManager;
     }
 

@@ -67,7 +67,7 @@ public class AccessTokenController {
             // 获取 auth code
             final String authCode = oAuthTokenRequest.getParam(OAuth.OAUTH_CODE);
             // 检查授权类型是否为 code
-            if (GrantType.AUTHORIZATION_CODE.name().equals(oAuthTokenRequest.getParam(OAuth.OAUTH_GRANT_TYPE))) {
+            if (GrantType.AUTHORIZATION_CODE.toString().equals(oAuthTokenRequest.getParam(OAuth.OAUTH_GRANT_TYPE))) {
                 if (!this.oAuthService.checkAuthCode(authCode)) {
                     final OAuthResponse response = OAuthASResponse.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
                             .setError(OAuthError.TokenResponse.INVALID_GRANT)
