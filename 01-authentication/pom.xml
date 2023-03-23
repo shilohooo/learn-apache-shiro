@@ -12,4 +12,11 @@
 
   <artifactId>01-authentication</artifactId>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>
+  </dependencies>
+
 </project>
