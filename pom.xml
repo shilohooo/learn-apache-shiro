@@ -46,6 +46,8 @@
     <module>15-oauth2</module>
     <!--    oauth2 客户端 - 集成 apache-oltu-->
     <module>15-oauth2-client</module>
+    <!--    并发登录控制-->
+    <module>16-concurrent-login-control</module>
   </modules>
 
   <properties>
