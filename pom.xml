@@ -48,6 +48,8 @@
     <module>15-oauth2-client</module>
     <!--    并发登录控制-->
     <module>16-concurrent-login-control</module>
+    <!--    动态 URL-->
+    <module>17-dynamic-url</module>
   </modules>
 
   <properties>
