@@ -2,7 +2,7 @@ package org.shiloh.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.shiloh.utils.PasswordUtils;
+import org.shiloh.web.utils.PasswordUtils;
 
 /**
  * @author shiloh

@@ -1,4 +1,4 @@
-package org.shiloh.utils;
+package org.shiloh.web.utils;
 
 import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
