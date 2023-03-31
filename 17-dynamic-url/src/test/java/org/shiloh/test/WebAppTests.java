@@ -21,10 +21,10 @@ import javax.sql.DataSource;
 @WebAppConfiguration
 public class WebAppTests {
     @Autowired
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     /**
      * 应用上下文加载测试
