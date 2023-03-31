@@ -30,7 +30,7 @@ public class SysUserDaoImpl implements SysUserDao {
     @Override
     public List<SysUser> findAll() {
         final String sql = "select * from learn_shiro.sys_user";
-        return this.jdbcTemplate.queryForList(sql, SysUser.class);
+        return this.jdbcTemplate.query(sql, new SysUser());
     }
 
     /**
