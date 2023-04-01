@@ -6,6 +6,7 @@ import org.shiloh.web.dao.SysRoleDao;
 import org.shiloh.web.entity.SysRole;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
@@ -98,7 +99,7 @@ public class SysRoleDaoImpl implements SysRoleDao {
     public SysRole findById(Long id) {
         final String sql = "select * from learn_shiro.sys_role where id = ?";
         try {
-            return this.jdbcTemplate.queryForObject(sql, new SysRole(), id);
+            return this.jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(SysRole.class), id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (DataAccessException e) {
@@ -117,6 +118,6 @@ public class SysRoleDaoImpl implements SysRoleDao {
     @Override
     public List<SysRole> findAll() {
         final String sql = "select * from learn_shiro.sys_role";
-        return this.jdbcTemplate.query(sql, new SysRole());
+        return this.jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SysRole.class));
     }
 }

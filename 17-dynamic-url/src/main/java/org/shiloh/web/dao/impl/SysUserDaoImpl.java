@@ -6,6 +6,7 @@ import org.shiloh.web.dao.SysUserDao;
 import org.shiloh.web.entity.SysUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
@@ -99,7 +100,7 @@ public class SysUserDaoImpl implements SysUserDao {
     @Override
     public List<SysUser> findAll() {
         final String sql = "select * from learn_shiro.sys_user";
-        return this.jdbcTemplate.query(sql, new SysUser());
+        return this.jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SysUser.class));
     }
 
     /**
@@ -114,7 +115,7 @@ public class SysUserDaoImpl implements SysUserDao {
     public SysUser findById(Long id) {
         final String sql = "select * from learn_shiro.sys_user where id = ?";
         try {
-            return this.jdbcTemplate.queryForObject(sql, new SysUser(), id);
+            return this.jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(SysUser.class), id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (DataAccessException e) {
@@ -135,7 +136,7 @@ public class SysUserDaoImpl implements SysUserDao {
     public SysUser findByUsername(String username) {
         final String sql = "select * from learn_shiro.sys_user where username = ?";
         try {
-            return this.jdbcTemplate.queryForObject(sql, new SysUser(), username);
+            return this.jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(SysUser.class), username);
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (DataAccessException e) {
