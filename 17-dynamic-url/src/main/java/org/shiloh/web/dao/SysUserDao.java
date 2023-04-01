@@ -12,6 +12,35 @@ import java.util.List;
  */
 public interface SysUserDao {
     /**
+     * 新增用户
+     *
+     * @param sysUser 用户信息
+     * @return 新增后带主键的用户信息
+     * @author shiloh
+     * @date 2023/4/1 22:58
+     */
+    SysUser add(SysUser sysUser);
+
+    /**
+     * 根据 ID 更新用户信息
+     *
+     * @param sysUser 用户信息
+     * @return 更新后的用户信息
+     * @author shiloh
+     * @date 2023/4/1 22:59
+     */
+    SysUser update(SysUser sysUser);
+
+    /**
+     * 根据 ID 删除用户信息
+     *
+     * @param id ID
+     * @author shiloh
+     * @date 2023/4/1 22:59
+     */
+    void deleteById(Long id);
+
+    /**
      * 查询所有用户信息
      *
      * @return 用户列表
