@@ -37,7 +37,7 @@ public class SysUser extends BaseEntity implements RowMapper<SysUser> {
     /**
      * 帐号是否被锁定
      */
-    private Boolean locked;
+    private Boolean locked = Boolean.FALSE;
 
     /**
      * 获取用于加密密码的盐：username + salt
