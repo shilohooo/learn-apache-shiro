@@ -20,7 +20,8 @@ create table sys_user
     id       bigint(20) primary key auto_increment comment '自增主键',
     username varchar(50) comment '用户名',
     password varchar(500) comment '密码',
-    salt     varchar(255) comment '盐'
+    salt     varchar(255) comment '盐',
+    locked   bit(1) default b'0' comment '帐号是否被锁定'
 ) comment '用户信息表';
 
 # 菜单信息表
