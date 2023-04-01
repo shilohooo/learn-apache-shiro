@@ -54,6 +54,19 @@ public class SysUserDaoImpl implements SysUserDao {
     }
 
     /**
+     * 根据 ID 删除用户信息
+     *
+     * @param id ID
+     * @author shiloh
+     * @date 2023/4/1 22:59
+     */
+    @Override
+    public void deleteById(Long id) {
+        final String sql = "delete from learn_shiro.sys_user where id = ?";
+        this.jdbcTemplate.update(sql, id);
+    }
+
+    /**
      * 根据 ID 更新用户信息
      *
      * @param sysUser 用户信息
@@ -74,19 +87,6 @@ public class SysUserDaoImpl implements SysUserDao {
         );
 
         return sysUser;
-    }
-
-    /**
-     * 根据 ID 删除用户信息
-     *
-     * @param id ID
-     * @author shiloh
-     * @date 2023/4/1 22:59
-     */
-    @Override
-    public void deleteById(Long id) {
-        final String sql = "delete from learn_shiro.sys_user where id = ?";
-        this.jdbcTemplate.update(sql, id);
     }
 
     /**
