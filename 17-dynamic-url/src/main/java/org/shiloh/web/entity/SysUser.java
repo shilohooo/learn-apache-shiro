@@ -34,15 +34,4 @@ public class SysUser extends BaseEntity {
      * 帐号是否被锁定
      */
     private Boolean locked = Boolean.FALSE;
-
-    /**
-     * 获取用于加密密码的盐：username + salt
-     *
-     * @return 用于加密密码的盐
-     * @author shiloh
-     * @date 2023/3/31 23:02
-     */
-    public String getCredentialsSalt() {
-        return this.username + this.salt;
-    }
 }
