@@ -2,8 +2,8 @@ package org.shiloh.web.service;
 
 import org.shiloh.web.entity.SysUser;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 系统用户信息 Service
@@ -88,7 +88,7 @@ public interface SysUserService {
      * @author shiloh
      * @date 2023/4/5 22:14
      */
-    Collection<String> getRoles(Long userId);
+    Set<String> getRoles(Long userId);
 
     /**
      * 根据用户 ID 获取该用户的所有权限
@@ -98,5 +98,5 @@ public interface SysUserService {
      * @author shiloh
      * @date 2023/4/5 22:14
      */
-    Collection<String> getPermissions(Long userId);
+    Set<String> getPermissions(Long userId);
 }

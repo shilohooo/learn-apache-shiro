@@ -9,10 +9,7 @@ import org.shiloh.web.utils.PasswordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * 系统用户信息 Service Impl
@@ -131,7 +128,7 @@ public class SysUserServiceImpl implements SysUserService {
      * @date 2023/4/5 22:14
      */
     @Override
-    public Collection<String> getRoles(Long userId) {
+    public Set<String> getRoles(Long userId) {
         final String sql = "select r.name from learn_shiro.sys_user u inner join learn_shiro.sys_user_role ur" +
                 " on u.id = ur.user_id inner join learn_shiro.sys_role r on ur.role_id = r.id where u.id = ?";
         final List<String> roles = this.jdbcTemplate.queryForList(sql, String.class, userId);
@@ -151,7 +148,7 @@ public class SysUserServiceImpl implements SysUserService {
      * @date 2023/4/5 22:14
      */
     @Override
-    public Collection<String> getPermissions(Long userId) {
+    public Set<String> getPermissions(Long userId) {
         final String sql = "select m.permission from learn_shiro.sys_user u" +
                 " inner join learn_shiro.sys_user_role ur on u.id = ur.user_id" +
                 " inner join learn_shiro.sys_role r on ur.role_id = r.id" +
