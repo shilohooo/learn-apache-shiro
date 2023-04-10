@@ -59,7 +59,7 @@ public class MyUserRealm extends AuthorizingRealm {
         if (sysUser == null) {
             throw new UnknownAccountException("用户名不存在");
         }
-        if (!token.getCredentials().equals(sysUser.getPassword())) {
+        if (!new String((char[]) token.getCredentials()).equals(sysUser.getPassword())) {
             throw new IncorrectCredentialsException("用户名或密码错误");
         }
         if (Boolean.TRUE.equals(sysUser.getLocked())) {
